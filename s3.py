@@ -63,10 +63,9 @@ def clientThread(conn):
 	conn.send('Welcome to the server. Type something and hit enter\n') #send only takes string
 	rcv_msg = conn.recv(1024)
 	rcv_msg = tuple(stringToTuple(rcv_msg))
-	print type(rcv_msg)	
-	print type(userpass[0])
 	if rcv_msg in userpass:
 		user = userpass.index(rcv_msg)
+		print type(user)
 		print ('valid')	
 		try :
 			conn.sendall('valid')
@@ -78,6 +77,7 @@ def clientThread(conn):
 		while True:
 			try :
 				option = conn.recv(1024)
+				print option
 			except:
 				break
 			if option == str(1):
@@ -86,18 +86,30 @@ def clientThread(conn):
 				conn.close()
 			elif option == str(2):
 				print 'Post a message'
+				pst = conn.recv(1024)
+				conn.sendall(pst)
 			elif option == str(3):
 				print 'Change Password'
+				response = conn.recv(1024)
+				response = tuple(stringToTuple(response))
+				print response
+				print type( userpass[user][1]) , type(response[1])
+				print userpass[user][1] , response[1]
+
+				if userpass[user][1] == response[1]:
+					del userpass[user]
+					userpass.append(response)
+					
 			else:
 				try :
-					conn.sendall('Option not valid')
+					conn.send('Option not valid')
 				except socket.error:
 					print 'option not valid Send failed'
 					conn.close()
 					clients.remove(conn)
 	else:
 		try :
-			conn.sendall('Inalid')
+			conn.sendall('Invalid')
 		except socket.error:
 			print 'Invalid Send failed'
 	print 'Logged out'
