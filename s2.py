@@ -6,13 +6,9 @@ from thread import *
 import telnetlib
 
 HOST = ''	# Symbolic name meaning all available interfaces
-PORT = 23# Arbitrary non-privileged port
+PORT = 9999# Arbitrary non-privileged port
 
 
-with telnetlib.Telnet(HOST, PORT, 1) as session:
-    session.write(b"administrator\n")
-    session.write(b"password\n")
-    session.write(b"reboot\n")
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -44,8 +40,7 @@ class Client:
 	pas = ""
 	def tick(self):
 
-		conn.send(b"\xff\xfd\x2d")
-'''
+
 		if self.usr == "":
 			msg = "Welcome to the server. Please enter your username:"
 			usr = prompt(conn,msg)
@@ -63,7 +58,7 @@ class Client:
 			userList[usr] = hsh(pas)
 			userListFile = open("userListFile.txt","w")
 			userListFile.write(str(userList))
-		'''	
+	
 print 'Socket created'
 
 #Bind socket to local host and port
