@@ -2,7 +2,6 @@ import socket
 import sys
 from thread import *
 import time
-import hashlib
 
 '''
 Function Definition
@@ -16,11 +15,12 @@ def tupleToString(t):
 def stringToTuple(s):
 	t = s.split("<>")
 	return t
-def hsh(string):
-	return str(hashlib.sha256(str.encode(string)).hexdigest())
 
+'''
+Create Socket
+'''
 HOST = ''	# Symbolic name meaning all available interfaces
-PORT = 9485	# Arbitrary non-privileged port
+PORT = 9486	# Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 print 'Socket created'
@@ -46,10 +46,9 @@ Define variables:
 username && passwd
 message queue for each user
 '''
-clients =[] 
+clients = []
 # TODO: Part-1 : create a var to store username && password. NOTE: A set of username/password pairs are hardcoded here. 
-# e.g. userpass = [......]
-userpass = [('a','a'),('b','b'), ('c','c')] 
+userpass = [('a','a'), ('b','b'),('c','c')]
 messages = [[],[],[]]
 count = 0
 
@@ -59,50 +58,52 @@ Function for handling connections. This will be used to create threads
 def clientThread(conn):
 	global clients
 	global count
+	# Tips: Sending message to connected client
 	conn.send('Welcome to the server. Type something and hit enter\n') #send only takes string
 	rcv_msg = conn.recv(1024)
-	rcv_msg = ('a','a') 
+	rcv_msg = tuple(stringToTuple(rcv_msg)) 
 	if rcv_msg in userpass:
 		user = userpass.index(rcv_msg)
-		print type(user)
-		print ('valid')	
 		try :
-			conn.sendall('valid\n')
-		except socket.error:
-			print 'Send failed'
+			conn.sendall('valid')
+		except socket.error as err:
+			print 'Send failed', err
 			sys.exit()
 			
 		# Tips: Infinite loop so that function do not terminate and thread do not end.
 		while True:
 			try :
-				print 's'
 				option = conn.recv(1024)
-				print option
 			except:
 				break
 			if option == str(1):
 				print 'user logout'
-				# TODO: Part-1: Add the logout processing here
+				# TODO: Part-1: Add the logout processing here	
+				conn.recv(1024)
 				conn.close()
 			elif option == str(2):
 				print 'Post a message'
-				pst = conn.recv(1024)
-				for conn in clients: 
-					conn.sendall(pst)
+				message = conn.recv(1024)
+				for conn in clients:
+					conn.send(message)
+				conn.send("\nMessage Sent")
 			elif option == str(3):
 				print 'Change Password'
-				response = conn.recv(1024)
-				response = tuple(stringToTuple(response))
-				if userpass[user][1] == response[1]:
-					print 'status sent'
+				passwordTuple = conn.recv(1024)
+				passwordTuple = tuple(stringToTuple(passwordTuple))
+				print passwordTuple 
+				if userpass[user][1] == passwordTuple[0]:
+					conn.send("Password Changed")
+					userpass.append((userpass[user][0],passwordTuple[1]))
 					del userpass[user]
-					userpass.append(response)
+					userpass[user][1] = passwordTuple[1]
+				else:
+					conn.send("Password Incorrect") 
 					
 			else:
 				try :
 					conn.sendall('Option not valid')
-				except socket.error as err:
-					print err	
+				except socket.error:
 					print 'option not valid Send failed'
 					conn.close()
 					clients.remove(conn)

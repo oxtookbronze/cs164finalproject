@@ -1,4 +1,5 @@
 import socket
+import time
 import sys
 from thread import *
 import getpass
@@ -7,10 +8,12 @@ import os
 '''
 Function Definition
 '''
+global serverResponse
 def receiveThread(s):
 	while True:
 		try:
-			reply = s.recv(4096) # receive msg from server
+			serverResponse = s.recv(4096) # receive msg from server
+			print serverResponse
 			# You can add operations below once you receive msg
 			# from the server
 
@@ -43,8 +46,8 @@ print 'Socket Created'
 '''
 Resolve Hostname
 '''
-host = 'localhost'
-port = 9485
+host = '127.0.0.1'
+port = 9486
 try:
 	remote_ip = socket.gethostbyname(host)
 except socket.gaierror:
@@ -65,19 +68,19 @@ Enter Username and Passwd
 # Whenever a user connects to the server, they should be asked for their username and password.
 # Username should be entered as clear text but passwords should not (should be either obscured or hidden). 
 # get username from input. HINT: raw_input(); get passwd from input. HINT: getpass()
-# Send username && passwd to server
-welcome = s.recv(1024)
-print welcome
-usr = raw_input("Hey bud, what's your username?")
-passwd = getpass.getpass(prompt ="pssh... what's the passwd:",stream = None)
-s.send(tupleToString((usr,passwd)))
 
+# Send username && passwd to server
+welcome_msg = s.recv(1024)
+print welcome_msg
+username = raw_input("Username:")
+password = getpass.getpass(prompt = "Password:",stream = None)
+
+s.send(tupleToString((username,password)))
 
 '''
 TODO: Part-1.3: User should log in successfully if username and password are entered correctly. A set of username/password pairs are hardcoded on the server side. 
 '''
-reply = s.recv(1024)
-print reply
+reply = s.recv(5)
 if reply == 'valid': # TODO: use the correct string to replace xxx here!
 
 	# Start the receiving thread
@@ -85,30 +88,33 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 
 	message = ""
 	while True :
+
 		# TODO: Part-1.4: User should be provided with a menu. Complete the missing options in the menu!
-		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Post a message \n3. Change Password\n")
-		try:
+		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Post a message \n 3. Change your Password")
+		s.send(message)	
+		try :
 			# TODO: Send the selected option to the server
 			# HINT: use sendto()/sendall()
-			s.send(message)
 			if message == str(1):
-				print 'Logout'
+				s.send( 'Logout')
 				# TODO: add logout operation
-				s.close()
 			if message == str(2):
-				post = raw_input("What would you like to post")
-				s.send(post)
-			if message == str(3):
-				passwd = getpass.getpass(prompt = "fine, but what's your old one?",
-				stream = None)
-				newpasswd = getpass.getpass( prompt = "new one?", stream = None)
-				s.send(tupleToString((passwd,newpasswd)))
-				print (s.recv(1))
-				s.send('received')
-		except socket.error:
-			print 'failed'
-			sys.exit()
+				print 'Post a message'
+				message = raw_input("What would you like to post?")
+				message = "From " + username + " : " + message
+				s.send(message)
+				time.sleep(1)
 			# Add other operations, e.g. change password
+			if message == str(3):
+				print 'Change Password:'
+				oldpass = getpass.getpass(prompt = "Old Password:",stream = None)
+				newpass = getpass.getpass(prompt = "New Password:",stream = None)
+				passwordCheck = (oldpass,newpass)
+				s.send(tupleToString(passwordCheck))	
+				time.sleep(1)
+		except socket.error:
+			print 'Send failed'
+			sys.exit()
 else:
 	print 'Invalid username or passwword'
 
