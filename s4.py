@@ -78,9 +78,9 @@ def clientThread(conn):
 				break
 			if option == str(1):
 				print 'user logout'
+				break
 				# TODO: Part-1: Add the logout processing here	
 				conn.recv(1024)
-				conn.close()
 			elif option == str(2):
 				print 'Post a message'
 				message = conn.recv(1024)
@@ -96,14 +96,14 @@ def clientThread(conn):
 					conn.send("Password Changed")
 					userpass.append((userpass[user][0],passwordTuple[1]))
 					del userpass[user]
-					userpass[user][1] = passwordTuple[1]
 				else:
 					conn.send("Password Incorrect") 
 					
 			else:
 				try :
 					conn.sendall('Option not valid')
-				except socket.error:
+				except socket.error as err:
+					print err
 					print 'option not valid Send failed'
 					conn.close()
 					clients.remove(conn)

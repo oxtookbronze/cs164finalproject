@@ -46,7 +46,8 @@ print 'Socket Created'
 '''
 Resolve Hostname
 '''
-host = '127.0.0.1'
+#host = '127.0.0.1'
+host = '10.0.0.4'
 port = 9486
 try:
 	remote_ip = socket.gethostbyname(host)
@@ -90,7 +91,7 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 	while True :
 
 		# TODO: Part-1.4: User should be provided with a menu. Complete the missing options in the menu!
-		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Post a message \n 3. Change your Password")
+		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Post a message \n 3. Change your Password\n")
 		s.send(message)	
 		try :
 			# TODO: Send the selected option to the server
@@ -98,6 +99,7 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 			if message == str(1):
 				s.send( 'Logout')
 				# TODO: add logout operation
+				break
 			if message == str(2):
 				print 'Post a message'
 				message = raw_input("What would you like to post?")
