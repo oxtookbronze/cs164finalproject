@@ -91,7 +91,7 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 	while True :
 
 		# TODO: Part-1.4: User should be provided with a menu. Complete the missing options in the menu!
-		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Post a message \n 3. Change your Password\n 4. Send a Private Message\n")
+		message = raw_input("Choose an option (type the number): \n 1.Logout \n 2.Send Broadcast Message\n 3.Change your Password\n 4.Send a Private Message\n 5.Read Unread Messages\n 6.List all the available groups\n 7.Join Group\n 8.Send Group Message\n 9.Quit Group\n")
 		s.send(message)	
 		try :
 			# TODO: Send the selected option to the server
@@ -121,10 +121,29 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 				msg = raw_input("Message:")
 				s.send(tupleToString((username,recvusername,msg)))
 				time.sleep(1)	
+			if message == str(5):
+				time.sleep(1)
+				continueMessage = getpass.getpass(prompt = "Press any key to close messages", stream = None)
+			if message == str(6):
+				# List all available group chats
+				time.sleep(1)
+				continueMessage = getpass.getpass(prompt = "Press any key to close messages", stream = None)
+			if message == str(7):
+				# Request to join a group chat
+				print '5'	
+			if message == str(8):
+				# send group message
+				time.sleep(1)
+				groupNumber = raw_input("Group?")
+				grpMsg = raw_input("Message?")
+				s.send(tupleToString((groupNumber,grpMsg)))
+			if message == str(9):
+				print '3'
+				# quit group chat
+			
 		except socket.error:
 			print 'Send failed'
 			sys.exit()
 else:
 	print 'Invalid username or passwword'
-
 s.close()

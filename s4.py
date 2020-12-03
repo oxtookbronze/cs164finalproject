@@ -50,7 +50,8 @@ clients = []
 # TODO: Part-1 : create a var to store username && password. NOTE: A set of username/password pairs are hardcoded here. 
 userpass = [('a','a'), ('b','b'),('c','c')]
 messages = [] 
-userMap = {}
+subscriptions = [ 'Project1' ]  
+subscriptionUserMap = []
 count = 0
 #PAR
 
@@ -77,11 +78,6 @@ def clientThread(conn):
 		# Tips: Infinite loop so that function do not terminate and thread do not end.
 		while True:
 			try:	
-				for msg in messages:
-					if msg[1] == userpass[user][0]:
-						tmp =  str(msg[0] + ' says ' + msg[2])
-						conn.send(tmp)
-						messages.remove(msg)
 				option = conn.recv(1024)
 			except:
 				break
@@ -111,6 +107,58 @@ def clientThread(conn):
 				messageTuple = conn.recv(1024)
 				messageTuple = tuple(stringToTuple(messageTuple))
 				messages.append(messageTuple)
+			elif option == str(5):
+				for msg in messages:
+					if msg[1] == userpass[user][0]:
+						tmp =  str(msg[0] + ' says ' + msg[2])
+						conn.send(tmp)
+						messages.remove(msg)
+			elif option == str(6):
+				for gc in subscriptions:
+					msg = gc + '\n'
+					conn.send(msg)				
+			elif option == str(7):
+				for gc in range(len(subscriptions)):
+					msg = str(gc) +  ' ' + subscriptions[gc] + '\n'
+					conn.send(msg)				
+				conn.send("Enter the # of the group")
+				opt = conn.recv(1024)
+				try:
+					if (userpass[user][0], subscriptions[int(opt)]) not in subscriptionUserMap:
+
+						subscriptionUserMap.append( (userpass[user][0], subscriptions[int(opt)]) )
+					
+				except:
+					conn.send("invalid option chosen")
+			elif option == str(8):
+				for i in range(0,len(subscriptions)):
+					for j in subscriptionUserMap:	
+						if j[0] == userpass[user][0]:
+							msg = str(i) +' ' +  j[1] + '\n'
+							conn.send(msg)
+				gcMsg = conn.recv(1024)
+				gcMsg = tuple(stringToTuple(gcMsg))
+				print gcMsg
+				for i in subscriptionUserMap:
+					print 'i', i
+					print 'userMap',subscriptionUserMap[int(gcMsg[0])] 
+					if i[1] == subscriptions[int(gcMsg[0])]: 
+						messages.append( (i[1], i[0], gcMsg[1]))
+				print 'messages:'
+				print messages
+			elif option == str(9):
+				for i in range(0,len(subscriptions)):
+					for j in subscriptionUserMap:	
+						if j[0] == userpass[user][0]:
+							msg = str(i) +' ' +  j[1] + '\n'
+							conn.send(msg)
+				conn.send("Group #?")
+				groupNum = conn.recv(1024)
+				subscriptionUserMap.remove( (userpass[user][0] , subscriptions[int(groupNum)])) 
+
+				
+
+						
 			else:
 				try :
 					conn.sendall('Option not valid')
