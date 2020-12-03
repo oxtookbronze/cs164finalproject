@@ -49,8 +49,10 @@ message queue for each user
 clients = []
 # TODO: Part-1 : create a var to store username && password. NOTE: A set of username/password pairs are hardcoded here. 
 userpass = [('a','a'), ('b','b'),('c','c')]
-messages = [[],[],[]]
+messages = [] 
+userMap = {}
 count = 0
+#PAR
 
 '''
 Function for handling connections. This will be used to create threads
@@ -63,7 +65,9 @@ def clientThread(conn):
 	rcv_msg = conn.recv(1024)
 	rcv_msg = tuple(stringToTuple(rcv_msg)) 
 	if rcv_msg in userpass:
+		
 		user = userpass.index(rcv_msg)
+			
 		try :
 			conn.sendall('valid')
 		except socket.error as err:
@@ -72,10 +76,16 @@ def clientThread(conn):
 			
 		# Tips: Infinite loop so that function do not terminate and thread do not end.
 		while True:
-			try :
+			try:	
+				for msg in messages:
+					if msg[1] == userpass[user][0]:
+						tmp =  str(msg[0] + ' says ' + msg[2])
+						conn.send(tmp)
+						messages.remove(msg)
 				option = conn.recv(1024)
 			except:
 				break
+			
 			if option == str(1):
 				print 'user logout'
 				break
@@ -91,14 +101,16 @@ def clientThread(conn):
 				print 'Change Password'
 				passwordTuple = conn.recv(1024)
 				passwordTuple = tuple(stringToTuple(passwordTuple))
-				print passwordTuple 
 				if userpass[user][1] == passwordTuple[0]:
 					conn.send("Password Changed")
 					userpass.append((userpass[user][0],passwordTuple[1]))
 					del userpass[user]
 				else:
 					conn.send("Password Incorrect") 
-					
+			elif option == str(4):
+				messageTuple = conn.recv(1024)
+				messageTuple = tuple(stringToTuple(messageTuple))
+				messages.append(messageTuple)
 			else:
 				try :
 					conn.sendall('Option not valid')
@@ -134,7 +146,7 @@ main thread of the server
 print out the stats
 '''
 while 1:
-	message = raw_input()
+	message = raw_input()	
 	if message == 'messagecount':
 		print 'Since the server was opened ' + str(count) + ' messages have been sent'
 	elif message == 'usercount':
@@ -148,4 +160,6 @@ while 1:
 		messages.append([])
 		subscriptions.append([])
 		print 'User created'
+		 
+			
 s.close()
