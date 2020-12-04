@@ -123,23 +123,20 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 				time.sleep(1)	
 			if message == str(5):
 				time.sleep(1)
-				continueMessage = getpass.getpass(prompt = "Press any key to close messages", stream = None)
+				continueMessage = getpass.getpass(prompt = "Press ENTER key to close messages", stream = None)
 			if message == str(6):
 				# List all available group chats
 				time.sleep(1)
-				continueMessage = getpass.getpass(prompt = "Press any key to close messages", stream = None)
-			if message == str(7):
+				continueMessage = getpass.getpass(prompt = "Press ENTER to close messages", stream = None)
 				# Request to join a group chat
-				print '5'	
 			if message == str(8):
 				# send group message
 				time.sleep(1)
 				groupNumber = raw_input("Group?")
 				grpMsg = raw_input("Message?")
 				s.send(tupleToString((groupNumber,grpMsg)))
-			if message == str(9):
-				print '3'
 				# quit group chat
+				
 			
 		except socket.error:
 			print 'Send failed'
