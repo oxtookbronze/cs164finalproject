@@ -107,13 +107,14 @@ def clientThread(conn):
 				messageTuple = conn.recv(1024)
 				messageTuple = tuple(stringToTuple(messageTuple))
 				messages.append(messageTuple)
+				print messages
 			elif option == str(5):
-				for i in range(0,len(messages)):
-					if messages[i][1] == userpass[user][0]:
-						tmp =  str(messages[0] + ' says ' + messages[i][2])
+				print len(messages)
+				for i in range(len(messages)):
+					print i, messages[i]
+					if messages[i][0] == userpass[user][0]:
+						tmp =  str(messages[i][0] + ' says ' + messages[i][2] + '\n')
 						conn.send(tmp)
-						del messages[i]
-						i-=1
 			elif option == str(6):
 				for gc in subscriptions:
 					msg = gc + '\n'

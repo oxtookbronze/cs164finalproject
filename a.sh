@@ -1,1 +1,1 @@
-sudo mn --custom finalTopol.py --topo finalTopol -x
+sudo mn --custom finalTopol.py --topo mytopo -x
